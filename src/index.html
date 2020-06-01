@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"> 
+</head>
+<body id="elm">
+  <noscript>
+        You need to enable JavaScript to run this app.
+  </noscript>
+
+  <script src="build/Main.js"></script>
+
+    <script>
+    var app = Elm.Main.init({
+        node: document.getElementById('elm'),
+        flags: {lang: navigator.language || navigator.userLanguage }
+    });
+
+    let sjsworker = new Worker("worker.js")
+
+    app.ports.callJsValue.subscribe(function(v) {
+        // console.log ("sending ", v , " to worker")
+        sjsworker.postMessage(v)
+    })
+
+    sjsworker.onmessage = function (e) {
+        // console.log ("receives ", e , " from worker")
+        app.ports.receiveJsValue.send(e.data)
+    }
+
+    </script>
+</body>
+</html>
